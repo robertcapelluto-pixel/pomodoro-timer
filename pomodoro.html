@@ -21,7 +21,6 @@
       display: flex;
       align-items: center;
       justify-content: center;
-      transition: background 0.8s ease;
     }
 
     body.break-mode {
@@ -93,19 +92,73 @@
       border-color: var(--accent);
       color: var(--accent);
     }
+
+    .bg-slide {
+      position: fixed;
+      inset: 0;
+      background-size: cover;
+      background-position: center;
+      opacity: 0;
+      transition: opacity 1s ease;
+      z-index: -2;
+    }
+
+    .bg-slide.active {
+      opacity: 1;
+    }
+
+    .bg-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.55);
+      z-index: -1;
+    }
   </style>
 </head>
 <body>
+  <div class="bg-overlay"></div>
   <div class="container">
     <h1 id="display">25:00</h1>
     <p id="counter">Pomodoros completed: 0</p>
     <div class="buttons">
-      <button id="btn" onclick="toggle()">Start</button>
+      <button id="btn" onclick="toggle()" style="min-width: 7rem;">Start</button>
       <button onclick="reset()">Reset</button>
     </div>
   </div>
 
   <script>
+    const IMAGES = [
+      'background-images/aaron-burden-189321.jpg',
+      'background-images/adam-skalecki-161270.jpg',
+      'background-images/alex-blajan-100513.jpg',
+      'background-images/andy-kerr-153378.jpg',
+      'background-images/brooke-lark-229136.jpg',
+      'background-images/christian-joudrey-98245.jpg',
+      'background-images/deniz-fuchidzhiev-249553.jpg',
+      'background-images/denys-nevozhai-100695.jpg',
+      'background-images/denys-nevozhai-154974.jpg',
+      'background-images/ehmir-bautista-364387.jpg',
+      'background-images/emmad-mazhari-216134.jpg',
+      'background-images/fares-nimri-361821.jpg',
+    ];
+
+    let slideIndex = 0;
+    const slides = IMAGES.map(src => {
+      const el = document.createElement('div');
+      el.className = 'bg-slide';
+      el.style.backgroundImage = `url('${src}')`;
+      document.body.insertBefore(el, document.body.firstChild);
+      return el;
+    });
+
+    slides[slideIndex].classList.add('active');
+
+    setInterval(() => {
+      slides[slideIndex].classList.remove('active');
+      slideIndex = (slideIndex + 1) % slides.length;
+      slides[slideIndex].classList.add('active');
+    }, 5000);
+
     const WORK = 25 * 60;
     const BREAK = 5 * 60;
 
