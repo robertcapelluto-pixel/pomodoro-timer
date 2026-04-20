@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Pomodoro Timer</title>
+</head>
+<body>
+  <h1 id="display">25:00</h1>
+  <button id="btn" onclick="toggle()">Start</button>
+
+  <script>
+    let seconds = 25 * 60;
+    let interval = null;
+
+    function toggle() {
+      if (interval) {
+        clearInterval(interval);
+        interval = null;
+        document.getElementById('btn').textContent = 'Start';
+      } else {
+        interval = setInterval(() => {
+          if (seconds <= 0) {
+            clearInterval(interval);
+            interval = null;
+            document.getElementById('btn').textContent = 'Start';
+            return;
+          }
+          seconds--;
+          update();
+        }, 1000);
+        document.getElementById('btn').textContent = 'Stop';
+      }
+    }
+
+    function update() {
+      const m = String(Math.floor(seconds / 60)).padStart(2, '0');
+      const s = String(seconds % 60).padStart(2, '0');
+      document.getElementById('display').textContent = `${m}:${s}`;
+    }
+  </script>
+</body>
+</html>
