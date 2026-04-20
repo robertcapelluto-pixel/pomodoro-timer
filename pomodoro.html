@@ -6,11 +6,18 @@
 </head>
 <body>
   <h1 id="display">25:00</h1>
+  <p id="counter">Pomodoros completed: 0</p>
   <button id="btn" onclick="toggle()">Start</button>
+  <button onclick="reset()">Reset</button>
 
   <script>
-    let seconds = 25 * 60;
+    const WORK = 25 * 60;
+    const BREAK = 5 * 60;
+
+    let seconds = WORK;
+    let onBreak = false;
     let interval = null;
+    let pomodoros = 0;
 
     function toggle() {
       if (interval) {
@@ -18,18 +25,35 @@
         interval = null;
         document.getElementById('btn').textContent = 'Start';
       } else {
-        interval = setInterval(() => {
-          if (seconds <= 0) {
-            clearInterval(interval);
-            interval = null;
-            document.getElementById('btn').textContent = 'Start';
-            return;
-          }
-          seconds--;
-          update();
-        }, 1000);
+        interval = setInterval(tick, 1000);
         document.getElementById('btn').textContent = 'Stop';
       }
+    }
+
+    function tick() {
+      if (seconds > 0) {
+        seconds--;
+        update();
+      } else {
+        if (!onBreak) {
+          pomodoros++;
+          document.getElementById('counter').textContent = `Pomodoros completed: ${pomodoros}`;
+        }
+        onBreak = !onBreak;
+        seconds = onBreak ? BREAK : WORK;
+        update();
+      }
+    }
+
+    function reset() {
+      clearInterval(interval);
+      interval = null;
+      seconds = WORK;
+      onBreak = false;
+      pomodoros = 0;
+      document.getElementById('btn').textContent = 'Start';
+      document.getElementById('counter').textContent = 'Pomodoros completed: 0';
+      update();
     }
 
     function update() {
