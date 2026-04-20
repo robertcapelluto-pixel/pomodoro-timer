@@ -3,12 +3,107 @@
 <head>
   <meta charset="UTF-8">
   <title>Pomodoro Timer</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Inter:wght@300;400&display=swap');
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --accent: #ff6b6b;
+    }
+
+    body {
+      background: #1a1a2e;
+      color: #e0e0d0;
+      font-family: 'Inter', sans-serif;
+      font-weight: 300;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: background 0.8s ease;
+    }
+
+    body.break-mode {
+      --accent: #4ecdc4;
+    }
+
+    .container {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 2.8rem;
+    }
+
+    #display {
+      font-family: 'Share Tech Mono', monospace;
+      font-size: clamp(6rem, 22vw, 14rem);
+      font-weight: 400;
+      letter-spacing: 0.04em;
+      color: var(--accent);
+      line-height: 1;
+      text-shadow:
+        3px 0 0 rgba(255, 80, 80, 0.4),
+        -3px 0 0 rgba(80, 200, 255, 0.4);
+      animation: flicker 7s infinite;
+      transition: color 0.8s ease, text-shadow 0.8s ease;
+    }
+
+    body.break-mode #display {
+      text-shadow:
+        3px 0 0 rgba(78, 205, 196, 0.4),
+        -3px 0 0 rgba(78, 205, 196, 0.2);
+    }
+
+    @keyframes flicker {
+      0%, 92%, 96%, 100% { opacity: 1; }
+      93% { opacity: 0.7; }
+      94% { opacity: 1; }
+      95% { opacity: 0.5; }
+    }
+
+    #counter {
+      font-size: 0.85rem;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: rgba(224, 224, 208, 0.4);
+    }
+
+    .buttons {
+      display: flex;
+      gap: 1.2rem;
+    }
+
+    button {
+      font-family: 'Inter', sans-serif;
+      font-weight: 300;
+      font-size: 0.8rem;
+      letter-spacing: 0.25em;
+      text-transform: uppercase;
+      color: #e0e0d0;
+      background: transparent;
+      border: 1px solid rgba(224, 224, 208, 0.35);
+      border-radius: 999px;
+      padding: 0.6rem 2rem;
+      cursor: pointer;
+      transition: border-color 0.2s, color 0.2s;
+    }
+
+    button:hover {
+      border-color: var(--accent);
+      color: var(--accent);
+    }
+  </style>
 </head>
 <body>
-  <h1 id="display">25:00</h1>
-  <p id="counter">Pomodoros completed: 0</p>
-  <button id="btn" onclick="toggle()">Start</button>
-  <button onclick="reset()">Reset</button>
+  <div class="container">
+    <h1 id="display">25:00</h1>
+    <p id="counter">Pomodoros completed: 0</p>
+    <div class="buttons">
+      <button id="btn" onclick="toggle()">Start</button>
+      <button onclick="reset()">Reset</button>
+    </div>
+  </div>
 
   <script>
     const WORK = 25 * 60;
@@ -24,6 +119,7 @@
         clearInterval(interval);
         interval = null;
         document.getElementById('btn').textContent = 'Start';
+        document.title = 'Pomodoro Timer';
       } else {
         interval = setInterval(tick, 1000);
         document.getElementById('btn').textContent = 'Stop';
@@ -37,10 +133,13 @@
       } else {
         if (!onBreak) {
           pomodoros++;
-          document.getElementById('counter').textContent = `Pomodoros completed: ${pomodoros}`;
         }
         onBreak = !onBreak;
         seconds = onBreak ? BREAK : WORK;
+        document.body.classList.toggle('break-mode', onBreak);
+        document.getElementById('counter').textContent = onBreak
+          ? 'Break time.'
+          : `Pomodoros completed: ${pomodoros}`;
         update();
       }
     }
@@ -53,6 +152,8 @@
       pomodoros = 0;
       document.getElementById('btn').textContent = 'Start';
       document.getElementById('counter').textContent = 'Pomodoros completed: 0';
+      document.body.classList.remove('break-mode');
+      document.title = 'Pomodoro Timer';
       update();
     }
 
@@ -60,6 +161,9 @@
       const m = String(Math.floor(seconds / 60)).padStart(2, '0');
       const s = String(seconds % 60).padStart(2, '0');
       document.getElementById('display').textContent = `${m}:${s}`;
+      if (interval) {
+        document.title = `${m}:${s} — ${onBreak ? 'Break' : 'Work'}`;
+      }
     }
   </script>
 </body>
